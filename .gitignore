@@ -46,3 +46,37 @@ data/
 .idea/workspace.xml
 .idea/tasks.xml
 .idea/shelf/
+
+# System
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs und Temp
+*.log
+*.tmp
+
+# Java
+target/
+*.class
+*.jar
+!.mvn/wrapper/maven-wrapper.jar
+.gradle/
+
+# Docker / lokal
+.env
+.env.local
+.env.*.local
+docker-compose.override.yml
+
+# Datenbanken und Dumps
+*.sqlite
+*.sqlite3
+*.db
+dumps/
