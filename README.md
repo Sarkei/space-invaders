@@ -1,8 +1,10 @@
 # Space Invaders
 
-Aus Google Drive übernommenes Projekt-Repository.
+Klassisches Space-Invaders-Spiel in Java: Spieler, Aliens, Projektile und Drop-Items
+(Ammo, Extras) stecken im Package `com.spaceinvaders.core`. Build über Maven, Start als
+Container über Docker Compose.
 
-**Technik:** `Java` · `Docker Compose`
+**Technik:** `Java` · `Maven` · `Docker Compose`
 
 ## Inhalt
 
