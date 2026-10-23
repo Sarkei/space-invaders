@@ -1,10 +1,12 @@
 # Space Invaders
 
-Klassisches Space-Invaders-Spiel in Java: Spieler, Aliens, Projektile und Drop-Items
-(Ammo, Extras) stecken im Package `com.spaceinvaders.core`. Build über Maven, Start als
-Container über Docker Compose.
+Space-Invaders-Variante in Java mit sauber getrennter Spiellogik: `GameEngine` verwaltet den
+Zustand (`GameState`), Objekte wie `SpaceShip`, `Alien`, `Bullet` und `AmmoDrop` liegen im
+Package `com.spaceinvaders.core`. Gespielt wird wahlweise über einen Swing-Client
+(`SpaceInvadersMain`) oder einen Web-Renderer; Schwierigkeitsgrade und Upgrades sind
+eingebaut. Build mit Maven, Start per Docker Compose.
 
-**Technik:** `Java` · `Maven` · `Docker Compose`
+**Technik:** `Java` · `Swing` · `Maven` · `Docker Compose`
 
 ## Inhalt
 
