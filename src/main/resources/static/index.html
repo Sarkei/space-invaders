@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space Invaders</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: #000010;
+            color: #00e870;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ── Hintergrund-Sterne ── */
+        #starfield {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ── Screens ── */
+        .screen {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            width: 900px;
+        }
+        .screen.hidden { display: none; }
+
+        /* ── Titel ── */
+        h1 {
+            font-size: 3rem;
+            letter-spacing: 0.15em;
+            color: #00ff88;
+            text-shadow: 0 0 10px #00ff88, 0 0 30px #00cc66, 0 0 60px #009944;
+            margin-bottom: 8px;
+        }
+        h2 {
+            font-size: 1.8rem;
+            letter-spacing: 0.1em;
+            color: #00dd77;
+            text-shadow: 0 0 8px #00dd77;
+        }
+
+        /* ── Input ── */
+        input[type="text"] {
+            background: #001a0a;
+            border: 2px solid #00aa55;
+            color: #00ff88;
+            font-family: inherit;
+            font-size: 1.1rem;
+            padding: 10px 18px;
+            width: 400px;
+            outline: none;
+            transition: border-color .2s;
+        }
+        input[type="text"]:focus { border-color: #00ff88; box-shadow: 0 0 8px #00ff8844; }
+        input[type="text"]::placeholder { color: #336644; }
+
+        /* ── Buttons ── */
+        .btn-group { display: flex; gap: 12px; }
+
+        button {
+            background: #001a0a;
+            border: 2px solid #006633;
+            color: #00cc66;
+            font-family: inherit;
+            font-size: 0.95rem;
+            padding: 10px 24px;
+            cursor: pointer;
+            letter-spacing: 0.08em;
+            transition: all .15s;
+        }
+        button:hover { border-color: #00ff88; color: #00ff88; box-shadow: 0 0 10px #00ff8844; }
+        button.active {
+            border-color: #00ff88;
+            color: #00ff88;
+            background: #002a14;
+            box-shadow: 0 0 12px #00ff8866;
+        }
+        button.danger  { border-color: #cc3300; color: #ff5522; }
+        button.danger:hover { border-color: #ff5522; box-shadow: 0 0 10px #ff552244; }
+        button.primary {
+            border-color: #00cc66;
+            color: #00ff88;
+            padding: 12px 40px;
+            font-size: 1.1rem;
+            letter-spacing: 0.12em;
+        }
+        button.primary:hover { box-shadow: 0 0 20px #00ff8866; }
+        button:disabled { opacity: .3; cursor: not-allowed; }
+
+        /* ── Beschreibungs-Box ── */
+        .info-box {
+            border: 1px solid #004422;
+            background: #000d07;
+            padding: 10px 24px;
+            font-size: 0.85rem;
+            color: #669966;
+            text-align: center;
+            width: 400px;
+        }
+
+        /* ── Canvas-Wrapper ── */
+        #canvasWrapper {
+            position: relative;
+            width: 900px;
+            height: 600px;
+        }
+        #gameCanvas {
+            display: block;
+            border: 2px solid #003322;
+            background: #000008;
+        }
+
+        /* ── HUD über dem Canvas ── */
+        #hintBar {
+            font-size: 0.78rem;
+            color: #336644;
+            text-align: center;
+            margin-top: 4px;
+        }
+
+        /* ── Bestenliste ── */
+        table {
+            width: 700px;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        th, td {
+            padding: 8px 14px;
+            text-align: left;
+            border-bottom: 1px solid #003322;
+        }
+        th { color: #00aa55; border-bottom: 2px solid #00aa55; }
+        tr:hover td { background: #001a0a; }
+        .rank-gold   { color: #ffcc00; }
+        .rank-silver { color: #aaaaaa; }
+        .rank-bronze { color: #cc8844; }
+
+        /* ── Responsive ── */
+        @media (max-width: 950px) {
+            .screen, #canvasWrapper, #gameCanvas { width: 100vw; }
+            #gameCanvas { height: 60vw; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Hintergrund-Sterne-Canvas -->
+<canvas id="starfield"></canvas>
+
+<!-- ═══════════════════ START-SCREEN ═══════════════════ -->
+<div id="startScreen" class="screen">
+    <h1>SPACE INVADERS</h1>
+    <p style="color:#669966;font-size:.85rem;letter-spacing:.08em">
+        ← → / WASD bewegen &nbsp;|&nbsp; LEERTASTE halten = schießen &nbsp;|&nbsp;
+        Cyan-Drops = Munition &nbsp;|&nbsp; Gold-Drops = Upgrade!
+    </p>
+
+    <label style="align-self:flex-start;color:#99bb99;font-size:.85rem;margin-left:250px">
+        DEIN NAME
+    </label>
+    <input type="text" id="playerName" maxlength="16" placeholder="Name eingeben…" autocomplete="off">
+
+    <label style="align-self:flex-start;color:#99bb99;font-size:.85rem;margin-left:250px">
+        SCHWIERIGKEITSGRAD
+    </label>
+    <div class="btn-group">
+        <button class="diff-btn" data-diff="EASY">🟢 LEICHT</button>
+        <button class="diff-btn active" data-diff="MEDIUM">🔵 MITTEL</button>
+        <button class="diff-btn danger" data-diff="HARD">🔴 SCHWER</button>
+    </div>
+
+    <div class="info-box" id="diffInfo">
+        MITTEL: 3 Leben | 50 Munition | Normale Aliens
+    </div>
+
+    <div class="btn-group" style="margin-top:8px">
+        <button class="primary" id="startBtn" disabled>▶ SPIELEN</button>
+        <button id="leaderboardBtn">🏆 BESTENLISTE</button>
+    </div>
+</div>
+
+<!-- ═══════════════════ GAME-SCREEN ═══════════════════ -->
+<div id="gameScreen" class="screen hidden">
+    <div id="canvasWrapper">
+        <canvas id="gameCanvas" width="900" height="600"></canvas>
+    </div>
+    <div id="hintBar">← → / WASD bewegen &nbsp;|&nbsp; LEERTASTE halten = schießen &nbsp;|&nbsp; ESC / P = Pause</div>
+</div>
+
+<!-- ═══════════════════ LEADERBOARD-SCREEN ═══════════════════ -->
+<div id="leaderboardScreen" class="screen hidden">
+    <h2>🏆 BESTENLISTE</h2>
+    <table id="lbTable">
+        <thead>
+            <tr><th>#</th><th>Name</th><th>Score</th><th>Schwierigkeit</th><th>Datum</th></tr>
+        </thead>
+        <tbody id="lbBody">
+            <tr><td colspan="5" style="color:#336644;text-align:center">Lädt…</td></tr>
+        </tbody>
+    </table>
+    <button id="backBtn" class="primary" style="margin-top:16px">← ZURÜCK</button>
+</div>
+
+<script src="game.js"></script>
+</body>
+</html>
